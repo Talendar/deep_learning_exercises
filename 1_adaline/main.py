@@ -15,7 +15,7 @@ from adaline import Adaline
 SAMPLES_DIR_A = "./data/a/"                  # directory where the "A" images are
 SAMPLES_DIR_A_INV = "./data/a_inverted/"     # directory where the inverted "A" images are
                                              #
-SAMPLES_PER_CLASS = 20                       # total number of images per class
+SAMPLES_PER_CLASS = 28                       # total number of images per class
 TEST_SAMPLES_PER_CLASS = 5                   # number of samples to include in the test set
                                              #
 TRAINING_EPOCHS = 10                         # number of iterations of the learning algorithm
