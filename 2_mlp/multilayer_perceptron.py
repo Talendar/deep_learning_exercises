@@ -164,8 +164,9 @@ class MultilayerPerceptron:
                     layer.weights -= lr * dW[l]
                     layer.bias -= lr * db[l]
 
-            print("[Epoch %d/%d] Cost: %.2f" % (e+1, epochs, cost(self.predict(data), labels)), end = '\r')
+            print("[Epoch %d/%d] Cost: %.2f" % (e+1, epochs, cost(self.predict(data), labels)))
         print("")
+
     def fit(self, data, labels, cost_function, epochs, learning_rate, batch_size=32, gradient_checking=False):
         """ Fits the model to the given data.
 
