@@ -1,47 +1,36 @@
-# some_file.py
-import sys
-
-# insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '../2_mlp')
-
-from multilayer_perceptron import MultilayerPerceptron
-from cost_functions import MeanSquaredError
-
-import numpy as np
+from mlp.multilayer_perceptron import MultilayerPerceptron
+from mlp.cost_functions import MeanSquaredError
 import pandas as pd
-#import pygame
+import numpy as np
 
 ############### CONFIG ###############
-TEST_SET_PC = 0.2                    # percentage of the data to be used to test the model
-HIDDEN_LAYERS = [64]             # hidden layers architecture
-TRAINING_EPOCHS = 100                # number of training iterations
-LEARNING_RATE = 0.03                   # the model's learning rate
+TEST_SET_PC = 0.20                   # percentage of the data to be used to test the model
+HIDDEN_LAYERS = [32]                 # hidden layers architecture
+TRAINING_EPOCHS = 300                # number of training iterations
+LEARNING_RATE = 1                    # the model's learning rate
 ######################################
 
-def load_mnist(path):
-    """ Loads and shuffles the MNIST data. """
-    df = pd.read_csv(path).sample(frac=1).reset_index(drop=True)  # loads and shuffles data
+
+def load_wine():
+    """ Loads the wine data. """
+    df = pd.read_csv("./data/wine.data").reset_index(drop=True)  # loads and shuffles data
     X, Y = [], []
-
     for i, row in df.iterrows():
-        label, pixels = row["label"], row.drop("label").values / 255
-        X.append(pixels)
+        label, features = int(row["class"]), row.drop("class").values
+        X.append(features)
 
-        y = np.zeros(10)
-        y[label] = 1
+        y = np.zeros(3)
+        y[label-1] = 1
         Y.append(y)
 
     return np.array(X), np.array(Y)
 
-df = pd.read_csv(
-    'https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data', 
-    sep=',', 
-    header=None
-)
-labels = df.values[:,:1]
-data = np.array([[round(j, 4).astype(float) for j in i] for i in df.values[:,1:]])
 
-print(data)
+def normalize_data(training_data, test_data):
+    """ Normalizes the data. """
+    mean, std = np.mean(training_data, axis=0), np.std(training_data, axis=0)
+    return (training_data - mean) / std, \
+           (test_data - mean) / std
 
 
 def accuracy(H, Y):
@@ -57,34 +46,32 @@ def accuracy(H, Y):
     return hits / len(Y)
 
 
+if __name__ == "__main__":
+    data, labels = load_wine()
 
+    i = int(len(data) * TEST_SET_PC)
+    X_train, Y_train = data[i:], labels[i:]
+    X_test, Y_test = data[:i], labels[:i]
 
-print(len(data))
-i = int(len(data) * TEST_SET_PC)
-X_train, Y_train = data[i:].astype(float), labels[i:].astype(int)
-X_test, Y_test = data[:i].astype(float), labels[:i].astype(int)
+    X_train, X_test = normalize_data(X_train, X_test)
 
-print("\nTraining set samples: %d (%d%%)" % (len(X_train), 100*(1 - TEST_SET_PC)))
-print("Test set samples: %d (%d%%)" % (len(X_test), 100*TEST_SET_PC))
+    print("\nTraining set samples: %d (%d%%)" % (len(X_train), 100 * (1 - TEST_SET_PC)))
+    print("Test set samples: %d (%d%%)" % (len(X_test), 100 * TEST_SET_PC))
 
-mlp = MultilayerPerceptron(input_size=13, layers_size=HIDDEN_LAYERS + [3], layers_activation="sigmoid")
-print("\nInitial accuracy (training set): %.2f%%" % (100 * accuracy(mlp.predict(X_train), Y_train)))
-print("Initial accuracy (test set): %.2f%%" % (100 * accuracy(mlp.predict(X_test), Y_test)))
+    mlp = MultilayerPerceptron(input_size=13, layers_size=HIDDEN_LAYERS + [3], layers_activation="sigmoid")
+    print("\nInitial accuracy (training set): %.2f%%" % (100 * accuracy(mlp.predict(X_train), Y_train)))
+    print("Initial accuracy (test set): %.2f%%" % (100 * accuracy(mlp.predict(X_test), Y_test)))
 
+    print("\nStarting training session...")
+    mlp.fit(
+        data=X_train, labels=Y_train,
+        cost_function=MeanSquaredError(),
+        epochs=TRAINING_EPOCHS,
+        learning_rate=LEARNING_RATE,
+        batch_size=32,
+        gradient_checking=False
+    )
 
+    print("\nAccuracy (training set): %.2f%%" % (100 * accuracy(mlp.predict(X_train), Y_train)))
+    print("Accuracy (test set): %.2f%%\n" % (100 * accuracy(mlp.predict(X_test), Y_test)))
 
-
-
-
-print("\nStarting training session...")
-mlp.fit(
-  data=X_train, labels=Y_train,
-  cost_function=MeanSquaredError(),
-  epochs=TRAINING_EPOCHS,
-  learning_rate=LEARNING_RATE,
-  batch_size=32,
-  gradient_checking=False
-)
-
-print("\nAccuracy (training set): %.2f%%" % (100*accuracy(mlp.predict(X_train), Y_train)))
-print("Accuracy (test set): %.2f%%\n" % (100*accuracy(mlp.predict(X_test), Y_test)))
