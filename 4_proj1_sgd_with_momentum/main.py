@@ -16,7 +16,7 @@ import pandas as pd
 ############### CONFIG ###############
 WINE_DATA = True                     # if true, the wine data set is used; if false, the music data set is used
                                      #
-TEST_SET_PC = 0.3                    # percentage of the data to be used to test the model
+TEST_SET_PC = 0.25                   # percentage of the data to be used to test the model
 NORMALIZE_DATA = True                # if true, the input data will be normalized before being processed
 NORMALIZE_MUSIC_LABELS = True        # if true, the labels of the music data set will be normalized
                                      #
@@ -92,10 +92,14 @@ def evaluate_model():
         print("\n[Training set] Accuracy: %.2f%%" % (100 * accuracy(mlp.predict(X_train), Y_train)))
         print("    [Test set] Accuracy: %.2f%%" % (100 * accuracy(mlp.predict(X_test), Y_test)))
     else:
-        train_mae, train_std = abs_error(mdiv*mlp.predict(X_train), mdiv*Y_train)
-        test_mae, test_std = abs_error(mdiv*mlp.predict(X_test), Y_test)
-        print("\n[Training set]  MAE: {:.2f}  |  Abs. error std: {:.2f}".format(train_mae, train_std))
-        print("    [Test set]  MAE: {:.2f}  |  Abs. error std: {:.2f}".format(test_mae, test_std))
+        MSE = MeanSquaredError()
+        train_mae, train_std = abs_error(mdiv * mlp.predict(X_train), mdiv * Y_train)
+        train_mse = MSE(mdiv * mlp.predict(X_train), mdiv * Y_train)
+        print("\n[Training set]  MAE: {:.2f}  |  Abs. error std: {:.2f}  |  MSE: {:.2f}".format(train_mae, train_std, train_mse))
+
+        test_mae, test_std = abs_error(mdiv * mlp.predict(X_test), Y_test)
+        test_mse = MSE(mdiv * mlp.predict(X_test), Y_test)
+        print("    [Test set]  MAE: {:.2f}  |  Abs. error std: {:.2f}  |  MSE: {:.2f}".format(test_mae, test_std, test_mse))
 
 
 if __name__ == "__main__":

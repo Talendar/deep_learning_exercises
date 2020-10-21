@@ -141,7 +141,7 @@ class MultilayerPerceptron:
         :param batch_size: number of samples in the mini-batches.
         :param mt: momentum term.
         """""
-        print("Initial cost: %.2f\n" % cost(self.predict(data), labels))
+        print("Initial cost: %.5f\n" % cost(self.predict(data), labels))
         last_deltaW = [None] * len(self._layers)    # stores the last changes made to the weights
         for e in range(epochs):
             batches = self._make_batches(data, labels, batch_size)
@@ -169,7 +169,7 @@ class MultilayerPerceptron:
                     layer.weights += deltaW
                     layer.bias -= lr * db[l]
 
-            print("[Epoch %d/%d] Cost: %.2f" % (e+1, epochs, cost(self.predict(data), labels)))
+            print("[Epoch %d/%d] Cost: %.5f" % (e+1, epochs, cost(self.predict(data), labels)))
 
     def fit(self, data, labels, cost_function, epochs, learning_rate, batch_size=32, gradient_checking=False, momentum_term=0):
         """ Fits the model to the given data.
