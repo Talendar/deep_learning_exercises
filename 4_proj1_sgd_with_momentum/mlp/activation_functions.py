@@ -45,6 +45,12 @@ class LinearActivation(ActivationFunction):
             return z
         return 1
 
+class HiperbolicalActivation(ActivationFunction):
+    def __call__(self, z, derivative=False):
+        if not derivative:
+            return np.tanh(z)
+        return 1 - np.sqrt(np.tanh(z))
+
 
 def create_by_name(name):
     """ Creates an instance of the cost function with the given name. """
