@@ -1,4 +1,4 @@
-""" Performance comparison between an MLP model and a RBF network model using UCI's wine data set.
+""" Performance comparison between a MLP model and a RBF network model using UCI's wine data set.
 
 @author Gabriel Nogueira (Talendar)
 @author Marcel Otoboni
